@@ -1,4 +1,4 @@
-package com.example.surveyapp.Data.Dto;
+package com.example.surveyapp.Model.Auth;
 
 import lombok.Data;
 

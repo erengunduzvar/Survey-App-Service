@@ -1,6 +1,6 @@
 package com.example.surveyapp.Controller;
 
-import com.example.surveyapp.Data.Dto.LoginRequest;
+import com.example.surveyapp.Model.Auth.LoginRequest;
 
 import com.example.surveyapp.Model.Entity.UserAccount;
 import com.example.surveyapp.Repository.UserAccountRepository;

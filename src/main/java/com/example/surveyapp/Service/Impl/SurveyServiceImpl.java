@@ -1,4 +1,4 @@
-package com.example.surveyapp.Service;
+package com.example.surveyapp.Service.Impl;
 
 import com.example.surveyapp.Model.Dto.QuestionReportDto;
 import com.example.surveyapp.Model.Dto.SurveyDto;
@@ -11,6 +11,7 @@ import com.example.surveyapp.Model.Enum.SurveyStatus;
 import com.example.surveyapp.Repository.QuestionsRepository;
 import com.example.surveyapp.Repository.SectionRepository;
 import com.example.surveyapp.Repository.SurveyRepository;
+import com.example.surveyapp.Service.ISurveyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +20,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class SurveyService {
+public class SurveyServiceImpl implements ISurveyService {
     private final SurveyRepository surveyRepository;
     private final SectionRepository sectionRepository;
     private final QuestionsRepository questionsRepository;

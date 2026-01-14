@@ -128,7 +128,7 @@ public class SurveyServiceImpl implements ISurveyService {
                 inviteLink.setSurvey(survey);
                 inviteLink.setCreatedBy(SecurityContextHolder.getContext().getAuthentication().getName());
                 inviteLinkRepository.save(inviteLink);
-                mailService.sendSimpleMail(mail,survey.getName(),survey,inviteLink);
+                //mailService.sendSimpleMail(mail,survey.getName(),survey,inviteLink);
             }
 
         }

@@ -14,7 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/surveys")
 @RequiredArgsConstructor
-@PreAuthorize("hasAuthority('ADMIN')")
+@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 public class SurveyAdminController {
     private final ISurveyService surveyService;
 

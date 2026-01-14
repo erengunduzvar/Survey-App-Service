@@ -15,8 +15,9 @@ public class InviteLink {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long inviteId;
-
+    @Column(length = 1000)
     private String createdBy; // Olusturan kullanıcı ID veya email
+    @Column(length = 1000)
     private String invitedUserId; // Davet edilen kullanıcı ID veya email
 
     // Bir anketin birçok davet linki olabilir (ManyToOne)
@@ -29,7 +30,7 @@ public class InviteLink {
 
     private Boolean isSurveyComplete;
 
-    @Column(unique = true)
+    @Column(unique = true,length = 1000)
     private String inviteToken;
 
     private LocalDateTime tokenExpireDate;

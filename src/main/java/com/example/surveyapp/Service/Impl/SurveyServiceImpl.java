@@ -4,9 +4,11 @@ import com.example.surveyapp.Model.Dto.QuestionReportDto;
 import com.example.surveyapp.Model.Dto.SurveyDto;
 import com.example.surveyapp.Model.Dto.SurveyResponsesReportDto;
 import com.example.surveyapp.Model.Dto.UserAnswerDto;
+import com.example.surveyapp.Model.Entity.Answers;
 import com.example.surveyapp.Model.Entity.Questions;
 import com.example.surveyapp.Model.Entity.Section;
 import com.example.surveyapp.Model.Entity.Survey;
+import com.example.surveyapp.Model.Enum.QuestionTypeEnum;
 import com.example.surveyapp.Model.Enum.SurveyStatus;
 import com.example.surveyapp.Repository.QuestionsRepository;
 import com.example.surveyapp.Repository.SectionRepository;
@@ -16,7 +18,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -132,12 +136,47 @@ public class SurveyServiceImpl implements ISurveyService {
                 .map(q -> new QuestionReportDto(
                         q.getQuestionId(),
                         q.getQuestionText(),
+                        calculateAverageScoreInternal(q), // Puan hesaplama burada çağrılıyor
                         q.getAnswers().stream()
-                                .map(a -> new UserAnswerDto(1L, a.getAnswer())) // Örnek: userId 1L
+                                .map(a -> new UserAnswerDto(1L, a.getAnswer()))
                                 .toList()
                 )).toList();
 
         return new SurveyResponsesReportDto(survey.getSurveyId(), survey.getName(), questionReports);
+    }
+    // Helper metod: Dışarıdan id almak yerine direkt nesne ile çalışır
+    private Double calculateAverageScoreInternal(Questions question) {
+        // 1. Sadece LIKERT tipindeyse hesaplama yap
+        if (question.getQuestionType() != QuestionTypeEnum.LIKERT || question.getQuestionAnswers() == null) {
+            return null; // Likert değilse score null döner
+        }
+
+        // 2. Seçenekleri parse et (kötü, orta, iyi -> 1, 2, 3)
+        String[] options = question.getQuestionAnswers().split(",");
+        Map<String, Integer> scoreMap = new HashMap<>();
+        for (int i = 0; i < options.length; i++) {
+            scoreMap.put(options[i].trim(), i + 1);
+        }
+
+        List<Answers> userAnswers = question.getAnswers();
+        if (userAnswers == null || userAnswers.isEmpty()) return 0.0;
+
+        // 3. Puanları topla
+        double totalScore = 0;
+        int validAnswerCount = 0;
+
+        for (Answers answer : userAnswers) {
+            if (answer.getAnswer() != null) {
+                Integer score = scoreMap.get(answer.getAnswer().trim());
+                if (score != null) {
+                    totalScore += score;
+                    validAnswerCount++;
+                }
+            }
+        }
+
+        // 4. Ortalamayı döndür
+        return validAnswerCount > 0 ? (totalScore / validAnswerCount) : 0.0;
     }
 
 

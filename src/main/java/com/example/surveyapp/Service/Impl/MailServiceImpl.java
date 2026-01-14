@@ -15,6 +15,9 @@ import jakarta.mail.internet.MimeMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 
 @Slf4j
 @Service
@@ -25,7 +28,7 @@ public class MailServiceImpl implements IMailService {
 
 
     @Override
-    public void sendSimpleMail(String to, String subject, String text, Survey survey, InviteLink inviteLink) {
+    public void sendSimpleMail(String to, String subject, Survey survey, InviteLink inviteLink) {
 
         try {
             MimeMessage message = mailSender.createMimeMessage();
@@ -37,7 +40,7 @@ public class MailServiceImpl implements IMailService {
                 helper.setTo(to);
             }
             helper.setSubject(subject);
-            helper.setText(buildMailContent(text, survey, inviteLink), true); // true = HTML
+            helper.setText(buildMailContent(survey, inviteLink), true); // true = HTML
 
             mailSender.send(message);
             log.info("HTML mail sent to: {}", to);
@@ -48,7 +51,7 @@ public class MailServiceImpl implements IMailService {
 
     }
 
-    private @Nullable String buildMailContent(String text, Survey survey, InviteLink inviteLink) {
+    private @Nullable String buildMailContent(Survey survey, InviteLink inviteLink) {
 
         String mailContent = "<!DOCTYPE html>\n"
                 + "<html lang=\"tr\">\n"
@@ -203,7 +206,7 @@ public class MailServiceImpl implements IMailService {
 
         return mailContent.replace("{{SURVEY_TITLE}}", survey.getName())
                 .replace("{{SURVEY_LINK}}",
-                        "http://localhost:8080/user/api/v1/surveys/detail/" + inviteLink.getInviteToken());
+                        "http://localhost:8080/user/api/v1/surveys/detail/" + URLEncoder.encode(inviteLink.getInviteToken(), StandardCharsets.UTF_8));
 
     }
 

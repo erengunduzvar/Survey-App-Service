@@ -1,17 +1,18 @@
 package com.example.surveyapp.Service.Impl;
 
 import com.example.surveyapp.Model.Dto.*;
-import com.example.surveyapp.Model.Entity.Answers;
-import com.example.surveyapp.Model.Entity.Questions;
-import com.example.surveyapp.Model.Entity.Section;
-import com.example.surveyapp.Model.Entity.Survey;
+import com.example.surveyapp.Model.Entity.*;
 import com.example.surveyapp.Model.Enum.QuestionTypeEnum;
 import com.example.surveyapp.Model.Enum.SurveyStatus;
+import com.example.surveyapp.Repository.InviteLinkRepository;
 import com.example.surveyapp.Repository.QuestionsRepository;
 import com.example.surveyapp.Repository.SectionRepository;
 import com.example.surveyapp.Repository.SurveyRepository;
+import com.example.surveyapp.Service.IInviteTokenService;
+import com.example.surveyapp.Service.IMailService;
 import com.example.surveyapp.Service.ISurveyService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +27,9 @@ public class SurveyServiceImpl implements ISurveyService {
     private final SurveyRepository surveyRepository;
     private final SectionRepository sectionRepository;
     private final QuestionsRepository questionsRepository;
+    private final InviteLinkRepository inviteLinkRepository;
+    private final IInviteTokenService inviteTokenService;
+    private final IMailService mailService;
 
     // 1. GET /surveys - Tüm anketleri listele
     @Transactional(readOnly = true)
@@ -109,6 +113,24 @@ public class SurveyServiceImpl implements ISurveyService {
             // Mevcut bölümleri temizleyip DTO'dakileri eklemek en temiz yoldur (ID'ler korunacaksa eşleme yapılır)
             // Ancak en garantisi mevcut listeyi yönetmektir:
             updateSections(survey, dto);
+        }
+
+        if(dto.status() == SurveyStatus.PUBLISHED && dto.sections() == null || dto.sections().getFirst().questions() == null) {
+            throw new RuntimeException("Boş anket gönderilemez");
+        }
+
+        if(dto.status() == SurveyStatus.PUBLISHED) {
+            List<String> usersToSend = survey.getUsersToSend();
+            for (String mail : usersToSend) {
+                String inviteToken =  inviteTokenService.generateToken(mail,surveyId);
+                InviteLink inviteLink = new InviteLink();
+                inviteLink.setInviteToken(inviteToken);
+                inviteLink.setSurvey(survey);
+                inviteLink.setCreatedBy(SecurityContextHolder.getContext().getAuthentication().getName());
+                inviteLinkRepository.save(inviteLink);
+                mailService.sendSimpleMail(mail,survey.getName(),survey,inviteLink);
+            }
+
         }
 
         return SurveyDto.mapToDto(surveyRepository.save(survey));

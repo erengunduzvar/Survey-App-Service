@@ -1,4 +1,4 @@
-package com.example.surveyapp.Data.Dto;
+package com.example.surveyapp.Model.Dto;
 
 import java.util.List;
 

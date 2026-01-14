@@ -1,4 +1,4 @@
-package com.example.surveyapp.Data.Dto;
+package com.example.surveyapp.Model.Dto;
 
 public record QuestionDto(
         Long questionId,

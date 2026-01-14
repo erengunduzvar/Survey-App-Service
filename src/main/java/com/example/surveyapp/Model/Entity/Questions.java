@@ -1,8 +1,12 @@
 package com.example.surveyapp.Model.Entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "questions")
@@ -37,4 +41,11 @@ public class Questions {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Survey survey;
+
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference(value = "question-answer") // Sonsuz döngü engelleme
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @Builder.Default
+    private List<Answers> answers = new ArrayList<>();
 }

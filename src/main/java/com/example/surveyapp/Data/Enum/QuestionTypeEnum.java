@@ -1,17 +1,16 @@
-package com.example.surveyapp;
+package com.example.surveyapp.Data.Enum;
 
 import lombok.Getter;
 
 @Getter
-public enum QuestionType {
+public enum QuestionTypeEnum {
 
     LIKERT("Likert"),
     TEXT("Text");
 
     private final String value;
 
-    // Lombok yerine constructor'ı manuel yazıyoruz
-    QuestionType(String value) {
+QuestionTypeEnum(String value) {
         this.value = value;
     }
 

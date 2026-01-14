@@ -1,9 +1,6 @@
 package com.example.surveyapp.Service.Impl;
 
-import com.example.surveyapp.Model.Dto.QuestionReportDto;
-import com.example.surveyapp.Model.Dto.SurveyDto;
-import com.example.surveyapp.Model.Dto.SurveyResponsesReportDto;
-import com.example.surveyapp.Model.Dto.UserAnswerDto;
+import com.example.surveyapp.Model.Dto.*;
 import com.example.surveyapp.Model.Entity.Answers;
 import com.example.surveyapp.Model.Entity.Questions;
 import com.example.surveyapp.Model.Entity.Section;
@@ -21,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +38,7 @@ public class SurveyServiceImpl implements ISurveyService {
     // 2. POST /surveys - Yeni anket oluştur (Hiyerarşik)
     @Transactional
     public SurveyDto save(SurveyDto dto) {
+        // 1. Survey nesnesini oluştur
         Survey survey = Survey.builder()
                 .name(dto.name())
                 .status(SurveyStatus.DRAFT)
@@ -47,6 +46,34 @@ public class SurveyServiceImpl implements ISurveyService {
                 .endDate(dto.endDate())
                 .usersToSend(dto.usersToSend())
                 .build();
+
+        // 2. Eğer DTO içinde sectionlar varsa, onları da bağla
+        if (dto.sections() != null) {
+            List<Section> sections = dto.sections().stream().map(sDto -> {
+                Section section = Section.builder()
+                        .sectionName(sDto.sectionName())
+                        .priority(sDto.priority())
+                        .survey(survey) // Survey bağlantısı
+                        .build();
+
+                // 3. Section içindeki soruları bağla
+                if (sDto.questions() != null) {
+                    List<Questions> questions = sDto.questions().stream().map(qDto ->
+                            Questions.builder()
+                                    .questionText(qDto.questionText())
+                                    .questionType(qDto.questionType())
+                                    .questionPriority(qDto.questionPriority())
+                                    .questionAnswers(qDto.questionAnswers())
+                                    .section(section) // Section bağlantısı
+                                    .survey(survey)   // Survey bağlantısı
+                                    .build()
+                    ).collect(Collectors.toList());
+                    section.setQuestions(questions);
+                }
+                return section;
+            }).collect(Collectors.toList());
+            survey.setSections(sections);
+        }
 
         return SurveyDto.mapToDto(surveyRepository.save(survey));
     }
@@ -63,20 +90,26 @@ public class SurveyServiceImpl implements ISurveyService {
     @Override
     @Transactional
     public SurveyDto update(String surveyId, SurveyDto dto) {
-        // 1. Mevcut anketi veritabanından getir
+        // 1. Mevcut anketi getir
         Survey survey = surveyRepository.findById(surveyId)
                 .orElseThrow(() -> new RuntimeException("Anket bulunamadı"));
 
-        // 2. KRİTİK KONTROL: Sadece DRAFT olanlar değişebilir
+        // 2. Durum kontrolü
         if (survey.getStatus() != SurveyStatus.DRAFT) {
-            throw new RuntimeException("Hata: Sadece 'TASLAK' (DRAFT) durumundaki anketler üzerinde değişiklik yapılabilir.");
+            throw new RuntimeException("Sadece TASLAK anketler güncellenebilir.");
         }
 
-        // 3. Eğer anket DRAFT ise güncellemeleri uygula
+        // 3. Temel alanları güncelle
         survey.setName(dto.name());
         survey.setEndDate(dto.endDate());
         survey.setUsersToSend(dto.usersToSend());
-        // Not: startDate genellikle oluşunca sabit kalır, bu yüzden update'e eklemedik.
+
+        // 4. SECTIONS VE QUESTIONS GÜNCELLEME (Senkronizasyon)
+        if (dto.sections() != null) {
+            // Mevcut bölümleri temizleyip DTO'dakileri eklemek en temiz yoldur (ID'ler korunacaksa eşleme yapılır)
+            // Ancak en garantisi mevcut listeyi yönetmektir:
+            updateSections(survey, dto);
+        }
 
         return SurveyDto.mapToDto(surveyRepository.save(survey));
     }
@@ -177,6 +210,73 @@ public class SurveyServiceImpl implements ISurveyService {
 
         // 4. Ortalamayı döndür
         return validAnswerCount > 0 ? (totalScore / validAnswerCount) : 0.0;
+    }
+
+    private void updateSections(Survey survey, SurveyDto dto) {
+        // Mevcut bölümleri bir haritaya al (Hızlı erişim için)
+        Map<Long, Section> existingSections = new HashMap<>();
+        if (survey.getSections() != null) {
+            survey.getSections().forEach(s -> existingSections.put(s.getSectionId(), s));
+        }
+
+        // Yeni bölüm listesini oluştur
+        List<Section> updatedSections = dto.sections().stream().map(sDto -> {
+            Section section;
+            if (sDto.sectionId() != null && existingSections.containsKey(sDto.sectionId())) {
+                // MEVCUT BÖLÜMÜ GÜNCELLE
+                section = existingSections.get(sDto.sectionId());
+                section.setSectionName(sDto.sectionName());
+                section.setPriority(sDto.priority());
+            } else {
+                // YENİ BÖLÜM EKLE
+                section = Section.builder()
+                        .sectionName(sDto.sectionName())
+                        .priority(sDto.priority())
+                        .survey(survey)
+                        .build();
+            }
+
+            // BÖLÜMÜN SORULARINI GÜNCELLE
+            updateQuestions(section, sDto, survey);
+
+            return section;
+        }).collect(Collectors.toList());
+
+        // Survey'in section listesini güncelle (orphanRemoval sayesinde eskiler silinir)
+        survey.getSections().clear();
+        survey.getSections().addAll(updatedSections);
+    }
+
+    private void updateQuestions(Section section, SectionDto sDto, Survey survey) {
+        Map<Long, Questions> existingQuestions = new HashMap<>();
+        if (section.getQuestions() != null) {
+            section.getQuestions().forEach(q -> existingQuestions.put(q.getQuestionId(), q));
+        }
+
+        List<Questions> updatedQuestions = sDto.questions().stream().map(qDto -> {
+            if (qDto.questionId() != null && existingQuestions.containsKey(qDto.questionId())) {
+                // MEVCUT SORUYU GÜNCELLE
+                Questions q = existingQuestions.get(qDto.questionId());
+                q.setQuestionText(qDto.questionText());
+                q.setQuestionType(qDto.questionType());
+                q.setQuestionPriority(qDto.questionPriority());
+                q.setQuestionAnswers(qDto.questionAnswers());
+                return q;
+            } else {
+                // YENİ SORU EKLE
+                return Questions.builder()
+                        .questionText(qDto.questionText())
+                        .questionType(qDto.questionType())
+                        .questionPriority(qDto.questionPriority())
+                        .questionAnswers(qDto.questionAnswers())
+                        .section(section)
+                        .survey(survey)
+                        .build();
+            }
+        }).collect(Collectors.toList());
+
+        section.getQuestions().clear();
+        section.getQuestions().addAll(updatedQuestions);
     }
 
 

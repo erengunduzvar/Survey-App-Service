@@ -7,6 +7,7 @@ import com.example.surveyapp.Model.Dto.UserAnswerDto;
 import com.example.surveyapp.Model.Entity.Questions;
 import com.example.surveyapp.Model.Entity.Section;
 import com.example.surveyapp.Model.Entity.Survey;
+import com.example.surveyapp.Model.Enum.SurveyStatus;
 import com.example.surveyapp.Repository.QuestionsRepository;
 import com.example.surveyapp.Repository.SectionRepository;
 import com.example.surveyapp.Repository.SurveyRepository;
@@ -36,7 +37,7 @@ public class SurveyService {
     public SurveyDto save(SurveyDto dto) {
         Survey survey = Survey.builder()
                 .name(dto.name())
-                .status(dto.status())
+                .status(SurveyStatus.DRAFT)
                 .startDate(dto.startDate())
                 .endDate(dto.endDate())
                 .usersToSend(dto.usersToSend())
@@ -84,7 +85,7 @@ public class SurveyService {
 
         Survey copy = Survey.builder()
                 .name(newName)
-                .status("DRAFT")
+                .status(SurveyStatus.DRAFT)
                 .usersToSend(original.getUsersToSend())
                 .build();
         Survey savedCopy = surveyRepository.save(copy);

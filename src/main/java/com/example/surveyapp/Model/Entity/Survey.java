@@ -1,5 +1,6 @@
 package com.example.surveyapp.Model.Entity;
 
+import com.example.surveyapp.Model.Enum.SurveyStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -20,7 +21,9 @@ public class Survey {
     private String surveyId;
 
     private String name;
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private SurveyStatus status = SurveyStatus.DRAFT;
 
     @Builder.Default
     private LocalDateTime startDate = LocalDateTime.now();

@@ -56,15 +56,23 @@ public class SurveyServiceImpl implements ISurveyService {
     }
 
     // 4. PUT /surveys/{surveyId} - Anket güncelle
+    @Override
     @Transactional
     public SurveyDto update(String surveyId, SurveyDto dto) {
+        // 1. Mevcut anketi veritabanından getir
         Survey survey = surveyRepository.findById(surveyId)
                 .orElseThrow(() -> new RuntimeException("Anket bulunamadı"));
 
+        // 2. KRİTİK KONTROL: Sadece DRAFT olanlar değişebilir
+        if (survey.getStatus() != SurveyStatus.DRAFT) {
+            throw new RuntimeException("Hata: Sadece 'TASLAK' (DRAFT) durumundaki anketler üzerinde değişiklik yapılabilir.");
+        }
+
+        // 3. Eğer anket DRAFT ise güncellemeleri uygula
         survey.setName(dto.name());
-        survey.setStatus(dto.status());
         survey.setEndDate(dto.endDate());
         survey.setUsersToSend(dto.usersToSend());
+        // Not: startDate genellikle oluşunca sabit kalır, bu yüzden update'e eklemedik.
 
         return SurveyDto.mapToDto(surveyRepository.save(survey));
     }

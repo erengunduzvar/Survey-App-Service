@@ -1,10 +1,11 @@
 package com.example.surveyapp.Model.Dto;
 
 import com.example.surveyapp.Model.Entity.Questions;
+import com.example.surveyapp.Model.Enum.QuestionTypeEnum;
 
 public record QuestionDto(
         Long questionId,
-        String questionType,     // Veya daha önce oluşturduğumuz QuestionType enum'ı
+        QuestionTypeEnum questionType,     // Veya daha önce oluşturduğumuz QuestionType enum'ı
         Integer questionPriority,
         String questionText,
         String questionAnswers,

@@ -1,5 +1,6 @@
 package com.example.surveyapp.Model.Entity;
 
+import com.example.surveyapp.Model.Enum.QuestionTypeEnum;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,7 +20,9 @@ public class Questions {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long questionId;
 
-    private String questionType;
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private QuestionTypeEnum questionType = QuestionTypeEnum.TEXT;
     private Integer questionPriority;
     private String questionText;
 

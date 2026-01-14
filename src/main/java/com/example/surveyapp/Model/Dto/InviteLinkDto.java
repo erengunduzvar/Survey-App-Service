@@ -12,6 +12,18 @@ public record InviteLinkDto(
         LocalDateTime tokenExpireDate
 ) {
 
+    public static InviteLinkDto mapToDto(com.example.surveyapp.Model.Entity.InviteLink entity) {
+        return new InviteLinkDto(
+                entity.getInviteId(),
+                entity.getCreatedBy(),
+                entity.getInvitedUserId(),
+                entity.getSurvey() != null ? entity.getSurvey().getSurveyId() : null,
+                entity.getIsSurveyComplete(),
+                entity.getInviteToken(),
+                entity.getTokenExpireDate()
+        );
+    }
+
     public boolean isExpired() {
         return tokenExpireDate != null && tokenExpireDate.isBefore(LocalDateTime.now());
     }

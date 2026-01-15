@@ -238,7 +238,7 @@ public class SurveyServiceImpl implements SurveyService {
         Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new RuntimeException("Anket bulunamadı"));
 
         List<QuestionReportDto> questionReports = survey.getSections().stream().flatMap(section -> section.getQuestions().stream()).map(q -> new QuestionReportDto(q.getQuestionId(), q.getQuestionText(), calculateAverageScoreInternal(q), // Puan hesaplama burada çağrılıyor
-                q.getAnswers().stream().map(a -> new UserAnswerDto(1L, a.getAnswer())).toList())).toList();
+                q.getAnswers().stream().map(a -> new UserAnswerDto( a.getAnswer())).toList())).toList();
 
         return new SurveyResponsesReportDto(survey.getSurveyId(), survey.getName(), questionReports);
     }

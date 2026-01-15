@@ -11,6 +11,8 @@ import com.example.surveyapp.Repository.SurveyRepository;
 import com.example.surveyapp.Service.InviteTokenService;
 import com.example.surveyapp.Service.MailService;
 import com.example.surveyapp.Service.SurveyService;
+import com.example.surveyapp.Validators.InviteTokenValidator;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,7 @@ public class SurveyServiceImpl implements SurveyService {
     private final InviteLinkRepository inviteLinkRepository;
     private final InviteTokenService inviteTokenService;
     private final MailService mailService;
+    private final InviteTokenValidator inviteTokenValidator;
 
     // 1. GET /surveys - Tüm anketleri listele
     @Transactional(readOnly = true)
@@ -179,6 +182,35 @@ public class SurveyServiceImpl implements SurveyService {
                 questionsRepository.save(qCopy);
             });
         });
+    }
+    @Override
+    public SurveyDto getSurveyByInviteToken(String token) {
+        // 1. Token geçerli mi? (Geçersizse validator exception fırlatmalı)
+        Claims claims = inviteTokenValidator.validate(token);
+
+        // 2. Süresi dolmuş mu?
+        if (claims.getExpiration().before(new java.util.Date())) {
+            throw new RuntimeException("Bu davet linkinin süresi dolmuş.");
+        }
+
+        // 3. Veriyi çek ve DTO'ya çevir
+        String surveyId = claims.get("surveyId", String.class);
+        return surveyRepository.findById(surveyId)
+                .map(SurveyDto::mapToDto)
+                .orElseThrow(() -> new RuntimeException("Anket bulunamadı."));
+    }
+
+    @Override
+    @Transactional
+    public void submitSurveyByInviteToken(String token, SurveyDto surveyDto) {
+        Claims claims = inviteTokenValidator.validate(token);
+
+        if (claims.getExpiration().before(new java.util.Date())) {
+            throw new RuntimeException("Süresi dolmuş link ile cevap gönderilemez.");
+        }
+
+        // Burada cevapları kaydetme mantığı çalışacak
+        // Örn: surveyService.save(surveyDto);
     }
 
     // 7. GET /surveys/{surveyId}/responses - Soru bazlı cevap raporu

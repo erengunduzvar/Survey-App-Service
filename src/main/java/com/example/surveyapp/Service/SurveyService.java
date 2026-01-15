@@ -13,4 +13,6 @@ public interface SurveyService {
     void delete(String surveyId);
     void duplicateSurvey(String surveyId, String newName);
     SurveyResponsesReportDto getResponsesReport(String surveyId);
+    SurveyDto getSurveyByInviteToken(String token);
+    void submitSurveyByInviteToken(String token, SurveyDto surveyDto);
 }

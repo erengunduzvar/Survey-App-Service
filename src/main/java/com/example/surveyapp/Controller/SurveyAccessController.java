@@ -24,30 +24,15 @@ public class SurveyAccessController {
      */
     @GetMapping("/{token}")
     public ResponseEntity<SurveyDto> getSurveyByToken(@PathVariable String token) {
-        // Servis katmanında token kontrolü (geçerlilik süresi, kullanılmış mı vb.) yapılır
-        Claims claims = inviteTokenValidator.validate(token); //TODO EKLENECEK
-        if(claims.getExpiration().before(new java.util.Date())){
-            return ResponseEntity.status(401).build();
-        }
-        else {
-            return ResponseEntity.ok(surveyService.findById(claims.get("surveyId", String.class)));
-        }
-
+        return ResponseEntity.ok(surveyService.getSurveyByInviteToken(token));
     }
+
     @PostMapping("/{token}")
     public ResponseEntity<Void> postSurveyByToken(
             @PathVariable String token,
             @RequestBody SurveyDto surveyDto) {
-        // Servis katmanında token kontrolü (geçerlilik süresi, kullanılmış mı vb.) yapılır
-        Claims claims = inviteTokenValidator.validate(token); //TODO EKLENECEK
-        if(claims.getExpiration().before(new java.util.Date())){
-            return ResponseEntity.status(401).build();
-        }
-        else {
-            surveyService.save(surveyDto);
-            return ResponseEntity.ok().build();
-        }
+
+        surveyService.submitSurveyByInviteToken(token, surveyDto);
+        return ResponseEntity.ok().build();
     }
-
-
 }

@@ -1,7 +1,7 @@
 package com.example.surveyapp.Controller;
 
 import com.example.surveyapp.Model.Dto.SurveyDto;
-import com.example.surveyapp.Service.ISurveyService;
+import com.example.surveyapp.Service.SurveyService;
 import com.example.surveyapp.Validators.InviteTokenValidator;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 public class SurveyAccessController {
 
     private final InviteTokenValidator inviteTokenValidator;
-    private final ISurveyService surveyService;
+    private final SurveyService surveyService;
     /**
      * Davet tokenı ile ankete erişim sağlar.
      * URL örneği: GET /surveyAccess/abc123token

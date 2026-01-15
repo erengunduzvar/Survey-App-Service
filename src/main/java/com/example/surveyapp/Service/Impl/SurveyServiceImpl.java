@@ -8,9 +8,9 @@ import com.example.surveyapp.Repository.InviteLinkRepository;
 import com.example.surveyapp.Repository.QuestionsRepository;
 import com.example.surveyapp.Repository.SectionRepository;
 import com.example.surveyapp.Repository.SurveyRepository;
-import com.example.surveyapp.Service.IInviteTokenService;
-import com.example.surveyapp.Service.IMailService;
-import com.example.surveyapp.Service.ISurveyService;
+import com.example.surveyapp.Service.InviteTokenService;
+import com.example.surveyapp.Service.MailService;
+import com.example.surveyapp.Service.SurveyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -23,13 +23,13 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class SurveyServiceImpl implements ISurveyService {
+public class SurveyServiceImpl implements SurveyService {
     private final SurveyRepository surveyRepository;
     private final SectionRepository sectionRepository;
     private final QuestionsRepository questionsRepository;
     private final InviteLinkRepository inviteLinkRepository;
-    private final IInviteTokenService inviteTokenService;
-    private final IMailService mailService;
+    private final InviteTokenService inviteTokenService;
+    private final MailService mailService;
 
     // 1. GET /surveys - Tüm anketleri listele
     @Transactional(readOnly = true)

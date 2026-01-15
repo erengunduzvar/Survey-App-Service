@@ -5,7 +5,7 @@ import com.example.surveyapp.Model.Dto.SurveyResponsesReportDto;
 
 import java.util.List;
 
-public interface ISurveyService {
+public interface SurveyService {
     List<SurveyDto> findAll();
     SurveyDto save(SurveyDto dto);
     SurveyDto findById(String surveyId);

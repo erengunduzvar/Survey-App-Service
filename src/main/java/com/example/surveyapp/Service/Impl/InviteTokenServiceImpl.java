@@ -1,6 +1,6 @@
 package com.example.surveyapp.Service.Impl;
 
-import com.example.surveyapp.Service.IInviteTokenService;
+import com.example.surveyapp.Service.InviteTokenService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -13,7 +13,7 @@ import java.util.Date;
 import java.util.UUID;
 
 @Service
-public class InviteTokenServiceImpl implements IInviteTokenService {
+public class InviteTokenServiceImpl implements InviteTokenService {
 
     @Value("${survey.invite.secret}")
     private String secret;

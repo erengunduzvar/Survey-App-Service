@@ -3,7 +3,7 @@ package com.example.surveyapp.Controller;
 import com.example.surveyapp.Model.Dto.SurveyDto;
 import com.example.surveyapp.Model.Dto.SurveyResponsesReportDto;
 import com.example.surveyapp.Model.Enum.SurveyStatus;
-import com.example.surveyapp.Service.ISurveyService;
+import com.example.surveyapp.Service.SurveyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @PreAuthorize("hasAuthority('ROLE_ADMIN')")
 public class SurveyAdminController {
-    private final ISurveyService surveyService;
+    private final SurveyService surveyService;
 
     // 1. Tüm anketleri listele
     @GetMapping

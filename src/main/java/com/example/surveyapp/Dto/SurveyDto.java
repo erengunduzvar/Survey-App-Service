@@ -1,7 +1,7 @@
-package com.example.surveyapp.Model.Dto;
+package com.example.surveyapp.Dto;
 
-import com.example.surveyapp.Model.Entity.Survey;
-import com.example.surveyapp.Model.Enum.SurveyStatus;
+import com.example.surveyapp.Entity.Survey;
+import com.example.surveyapp.Enum.SurveyStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;

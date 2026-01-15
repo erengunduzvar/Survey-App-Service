@@ -1,9 +1,9 @@
 package com.example.surveyapp.Controller;
 
-import com.example.surveyapp.Model.Auth.LoginRequest;
+import com.example.surveyapp.Dto.LoginRequest;
 
-import com.example.surveyapp.Model.Dto.LoginResponseDto;
-import com.example.surveyapp.Model.Entity.UserAccount;
+import com.example.surveyapp.Dto.LoginResponseDto;
+import com.example.surveyapp.Entity.UserAccount;
 import com.example.surveyapp.Repository.UserAccountRepository;
 import com.example.surveyapp.Security.JwtService;
 import com.example.surveyapp.Service.AuthService;

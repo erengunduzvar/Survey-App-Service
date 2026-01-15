@@ -1,7 +1,7 @@
 package com.example.surveyapp.Service.Impl;
 
-import com.example.surveyapp.Model.Entity.InviteLink;
-import com.example.surveyapp.Model.Entity.Survey;
+import com.example.surveyapp.Entity.InviteLink;
+import com.example.surveyapp.Entity.Survey;
 import com.example.surveyapp.Service.MailService;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;

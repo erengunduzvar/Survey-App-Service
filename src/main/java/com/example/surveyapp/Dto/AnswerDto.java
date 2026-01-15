@@ -1,6 +1,6 @@
-package com.example.surveyapp.Model.Dto;
+package com.example.surveyapp.Dto;
 
-import com.example.surveyapp.Model.Entity.Answers;
+import com.example.surveyapp.Entity.Answers;
 
 public record AnswerDto(
         Long id,

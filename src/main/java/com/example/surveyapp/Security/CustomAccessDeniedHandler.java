@@ -1,5 +1,6 @@
 package com.example.surveyapp.Security;
 
+import com.example.surveyapp.Exception.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;

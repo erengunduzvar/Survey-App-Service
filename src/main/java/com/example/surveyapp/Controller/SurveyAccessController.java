@@ -1,6 +1,6 @@
 package com.example.surveyapp.Controller;
 
-import com.example.surveyapp.Model.Dto.SurveyDto;
+import com.example.surveyapp.Dto.SurveyDto;
 import com.example.surveyapp.Service.SurveyService;
 import com.example.surveyapp.Validators.InviteTokenValidator;
 import io.jsonwebtoken.Claims;

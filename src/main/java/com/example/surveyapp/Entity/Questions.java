@@ -1,6 +1,6 @@
-package com.example.surveyapp.Model.Entity;
+package com.example.surveyapp.Entity;
 
-import com.example.surveyapp.Model.Enum.QuestionTypeEnum;
+import com.example.surveyapp.Enum.QuestionTypeEnum;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;

@@ -1,8 +1,8 @@
 package com.example.surveyapp.Controller;
 
-import com.example.surveyapp.Model.Dto.SurveyDto;
-import com.example.surveyapp.Model.Dto.SurveyResponsesReportDto;
-import com.example.surveyapp.Model.Enum.SurveyStatus;
+import com.example.surveyapp.Dto.SurveyDto;
+import com.example.surveyapp.Dto.SurveyResponsesReportDto;
+import com.example.surveyapp.Enum.SurveyStatus;
 import com.example.surveyapp.Service.SurveyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

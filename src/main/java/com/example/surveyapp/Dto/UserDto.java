@@ -1,6 +1,6 @@
-package com.example.surveyapp.Model.Dto;
+package com.example.surveyapp.Dto;
 
-import com.example.surveyapp.Model.Entity.UserAccount;
+import com.example.surveyapp.Entity.UserAccount;
 
 /**
  * Kullanıcı bilgilerini güvenli bir şekilde dışarı açmak için kullanılan Record.

@@ -1,4 +1,4 @@
-package com.example.surveyapp.Security;
+package com.example.surveyapp.Exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,6 +1,6 @@
 package com.example.surveyapp.Repository;
 
-import com.example.surveyapp.Model.Entity.Section;
+import com.example.surveyapp.Entity.Section;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.example.surveyapp.Model.Entity;
+package com.example.surveyapp.Entity;
 
 import jakarta.persistence.*;
 import lombok.*;

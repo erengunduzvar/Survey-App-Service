@@ -1,4 +1,6 @@
-package com.example.surveyapp.Model.Dto;
+package com.example.surveyapp.Dto;
+
+import com.example.surveyapp.Entity.InviteLink;
 
 import java.time.LocalDateTime;
 
@@ -12,7 +14,7 @@ public record InviteLinkDto(
         LocalDateTime tokenExpireDate
 ) {
 
-    public static InviteLinkDto mapToDto(com.example.surveyapp.Model.Entity.InviteLink entity) {
+    public static InviteLinkDto mapToDto(InviteLink entity) {
         return new InviteLinkDto(
                 entity.getInviteId(),
                 entity.getCreatedBy(),

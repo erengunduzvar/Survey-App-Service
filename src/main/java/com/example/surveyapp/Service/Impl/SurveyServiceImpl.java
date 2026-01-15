@@ -1,9 +1,11 @@
 package com.example.surveyapp.Service.Impl;
 
+import com.example.surveyapp.Dto.*;
+import com.example.surveyapp.Entity.*;
 import com.example.surveyapp.Model.Dto.*;
 import com.example.surveyapp.Model.Entity.*;
-import com.example.surveyapp.Model.Enum.QuestionTypeEnum;
-import com.example.surveyapp.Model.Enum.SurveyStatus;
+import com.example.surveyapp.Enum.QuestionTypeEnum;
+import com.example.surveyapp.Enum.SurveyStatus;
 import com.example.surveyapp.Repository.InviteLinkRepository;
 import com.example.surveyapp.Repository.QuestionsRepository;
 import com.example.surveyapp.Repository.SectionRepository;

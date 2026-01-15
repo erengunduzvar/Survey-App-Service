@@ -1,4 +1,4 @@
-package com.example.surveyapp.Security;
+package com.example.surveyapp.Exception;
 
 public record ErrorResponse(
         int status,

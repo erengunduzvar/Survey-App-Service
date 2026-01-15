@@ -1,6 +1,6 @@
 package com.example.surveyapp.Security;
 
-import com.example.surveyapp.Model.Entity.UserAccount;
+import com.example.surveyapp.Entity.UserAccount;
 import com.example.surveyapp.Repository.UserAccountRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

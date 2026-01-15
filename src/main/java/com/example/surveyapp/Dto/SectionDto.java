@@ -1,6 +1,6 @@
-package com.example.surveyapp.Model.Dto;
+package com.example.surveyapp.Dto;
 
-import com.example.surveyapp.Model.Entity.Section;
+import com.example.surveyapp.Entity.Section;
 
 import java.util.List;
 

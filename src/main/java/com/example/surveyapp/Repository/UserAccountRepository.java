@@ -1,6 +1,6 @@
 package com.example.surveyapp.Repository;
 
-import com.example.surveyapp.Model.Entity.UserAccount;
+import com.example.surveyapp.Entity.UserAccount;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 

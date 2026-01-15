@@ -1,7 +1,7 @@
-package com.example.surveyapp.Model.Dto;
+package com.example.surveyapp.Dto;
 
-import com.example.surveyapp.Model.Entity.Questions;
-import com.example.surveyapp.Model.Enum.QuestionTypeEnum;
+import com.example.surveyapp.Entity.Questions;
+import com.example.surveyapp.Enum.QuestionTypeEnum;
 
 public record QuestionDto(
         Long questionId,

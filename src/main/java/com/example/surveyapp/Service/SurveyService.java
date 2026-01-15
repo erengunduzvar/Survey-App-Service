@@ -1,7 +1,7 @@
 package com.example.surveyapp.Service;
 
-import com.example.surveyapp.Model.Dto.SurveyDto;
-import com.example.surveyapp.Model.Dto.SurveyResponsesReportDto;
+import com.example.surveyapp.Dto.SurveyDto;
+import com.example.surveyapp.Dto.SurveyResponsesReportDto;
 
 import java.util.List;
 

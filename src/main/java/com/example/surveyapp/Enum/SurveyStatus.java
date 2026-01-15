@@ -1,4 +1,4 @@
-package com.example.surveyapp.Model.Enum;
+package com.example.surveyapp.Enum;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

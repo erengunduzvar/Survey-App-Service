@@ -35,9 +35,7 @@ public class AuthServiceImpl implements AuthService {
     public LoginResponseDto register(UserAccount user) {
         user.setPassword(encoder.encode(user.getPassword()));
 
-        if (user.getRole() == null || user.getRole().isEmpty()) {
-            user.setRole("ROLE_USER");
-        }
+        user.setRole("ROLE_USER");
 
         UserAccount saved = userRepo.save(user);
 

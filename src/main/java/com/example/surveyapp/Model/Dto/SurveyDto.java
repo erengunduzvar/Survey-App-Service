@@ -28,4 +28,15 @@ public record SurveyDto(
                         List.of()
         );
     }
+    public static SurveyDto mapToDtoWithoutDetails(Survey entity) {
+        return new SurveyDto(
+                entity.getSurveyId(),
+                entity.getName(),
+                entity.getStatus(), // Enum değeri döner
+                entity.getStartDate(),
+                entity.getEndDate(),
+                entity.getUsersToSend(),
+                null
+        );
+    }
 }

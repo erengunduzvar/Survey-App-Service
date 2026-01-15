@@ -21,8 +21,7 @@ public class Questions {
     private Long questionId;
 
     @Enumerated(EnumType.STRING)
-    @Builder.Default
-    private QuestionTypeEnum questionType = QuestionTypeEnum.TEXT;
+    private QuestionTypeEnum questionType;
     private Integer questionPriority;
     private String questionText;
 

@@ -35,7 +35,7 @@ public class SurveyServiceImpl implements ISurveyService {
     @Transactional(readOnly = true)
     public List<SurveyDto> findAll() {
         return surveyRepository.findAll().stream()
-                .map(SurveyDto::mapToDto)
+                .map(SurveyDto::mapToDtoWithoutDetails)
                 .toList();
     }
 

@@ -2,6 +2,7 @@ package com.example.surveyapp.Controller;
 
 import com.example.surveyapp.Model.Dto.SurveyDto;
 import com.example.surveyapp.Model.Dto.SurveyResponsesReportDto;
+import com.example.surveyapp.Model.Enum.SurveyStatus;
 import com.example.surveyapp.Service.ISurveyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -47,6 +48,9 @@ public class SurveyAdminController {
     // 5. Anketi sil
     @DeleteMapping("/{surveyId}")
     public ResponseEntity<Void> deleteSurvey(@PathVariable String surveyId) {
+        if(surveyService.findById(surveyId).status().equals(SurveyStatus.PUBLISHED)){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         surveyService.delete(surveyId);
         return ResponseEntity.noContent().build();
     }

@@ -1,6 +1,7 @@
 package com.example.surveyapp.Model.Entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,11 +26,13 @@ public class UserAccount implements UserDetails {
     private String email;
 
     @Column(nullable = false)
+    @JsonIgnore
     private String password; // Diyagramda yoktu ama güvenlik için gereklidir
 
     private String role; // Örn: ROLE_USER, ROLE_ADMIN
 
     @Transient
+
     private String token; // DB'ye kaydedilmez, sadece login sonrası döner
 
     // --- Spring Security (UserDetails) Metotları ---

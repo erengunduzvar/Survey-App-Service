@@ -2,6 +2,7 @@ package com.example.surveyapp.Controller;
 
 import com.example.surveyapp.Model.Auth.LoginRequest;
 
+import com.example.surveyapp.Model.Dto.LoginResponseDto;
 import com.example.surveyapp.Model.Entity.UserAccount;
 import com.example.surveyapp.Repository.UserAccountRepository;
 import com.example.surveyapp.Security.JwtService;
@@ -22,26 +23,22 @@ public class AuthController {
     private final PasswordEncoder encoder;
 
     @PostMapping("/register")
-    public UserAccount register(@RequestBody UserAccount user) {
+    public LoginResponseDto register(@RequestBody UserAccount user) {
         user.setPassword(encoder.encode(user.getPassword()));
-
         if (user.getRole() == null) user.setRole("ROLE_USER");
-
-        return userRepo.save(user);
+        UserAccount saved = userRepo.save(user);
+        String token = jwtService.generateToken(saved);
+        return new LoginResponseDto(saved.getId(), saved.getEmail(), saved.getRole(), token);
     }
 
     @PostMapping("/login")
-    public UserAccount login(@RequestBody LoginRequest req) {
+    public LoginResponseDto login(@RequestBody LoginRequest req) {
         UserAccount user = userRepo.findByEmail(req.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
         if (!encoder.matches(req.getPassword(), user.getPassword())) {
             throw new RuntimeException("Wrong password");
         }
-
         String token = jwtService.generateToken(user);
-        user.setToken(token);
-
-        return user;
+        return new LoginResponseDto(user.getId(), user.getEmail(), user.getRole(), token);
     }
 }

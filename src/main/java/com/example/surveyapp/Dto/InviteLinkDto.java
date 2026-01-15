@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 public record InviteLinkDto(
         Long inviteId,
         String createdBy,
-        String invitedUserId,
+        String invitedUserMail,
         String surveyId,         // Entity'deki Survey objesinin ID'si
         Boolean isSurveyComplete,
         String inviteToken,
@@ -18,7 +18,7 @@ public record InviteLinkDto(
         return new InviteLinkDto(
                 entity.getInviteId(),
                 entity.getCreatedBy(),
-                entity.getInvitedUserId(),
+                entity.getInvitedUserMail(),
                 entity.getSurvey() != null ? entity.getSurvey().getSurveyId() : null,
                 entity.getIsSurveyComplete(),
                 entity.getInviteToken(),

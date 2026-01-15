@@ -18,7 +18,7 @@ public class InviteLink {
     @Column(length = 1000)
     private String createdBy; // Olusturan kullanıcı ID veya email
     @Column(length = 1000)
-    private String invitedUserId; // Davet edilen kullanıcı ID veya email
+    private String invitedUserMail; // Davet edilen kullanıcı ID veya email
 
     // Bir anketin birçok davet linki olabilir (ManyToOne)
     @ManyToOne(fetch = FetchType.LAZY)

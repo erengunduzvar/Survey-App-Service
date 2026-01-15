@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -119,7 +120,7 @@ public class SurveyServiceImpl implements SurveyService {
             updateSections(survey, dto);
         }
 
-        if(dto.status() == SurveyStatus.PUBLISHED && dto.sections() == null || dto.sections().getFirst().questions() == null) {
+        if(dto.status() == SurveyStatus.PUBLISHED && dto.sections() == null || Objects.requireNonNull(dto.sections()).getFirst().questions() == null) {
             throw new RuntimeException("Boş anket gönderilemez");
         }
 
@@ -130,7 +131,8 @@ public class SurveyServiceImpl implements SurveyService {
                 InviteLink inviteLink = new InviteLink();
                 inviteLink.setInviteToken(inviteToken);
                 inviteLink.setSurvey(survey);
-                inviteLink.setCreatedBy(SecurityContextHolder.getContext().getAuthentication().getName());
+                inviteLink.setInvitedUserMail(mail);
+                inviteLink.setCreatedBy(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName());
                 inviteLinkRepository.save(inviteLink);
                 //mailService.sendSimpleMail(mail,survey.getName(),survey,inviteLink);
             }

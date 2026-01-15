@@ -16,4 +16,7 @@ public interface SurveyService {
     SurveyResponsesReportDto getResponsesReport(String surveyId);
     SurveyDto getSurveyByInviteToken(String token);
     void submitSurveyByInviteToken(String token, List<AnswerDto> answerDtoList);
+
+    void addPeopleToSurvey(String surveyId, List<String> userEmails);
+    void deletePeopleToSurvey(String surveyId, List<String> userEmails);
 }

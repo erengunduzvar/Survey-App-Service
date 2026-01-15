@@ -206,6 +206,32 @@ public class SurveyServiceImpl implements SurveyService {
         // Örn: surveyService.save(surveyDto);
     }
 
+    @Override
+    @Transactional
+    public void addPeopleToSurvey(String surveyId, List<String> userEmails) {
+        Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new RuntimeException("Anket bulunamadı"));
+        for (String mail : userEmails) {
+            String inviteToken = inviteTokenService.generateToken(mail, surveyId);
+            InviteLink inviteLink = new InviteLink();
+            inviteLink.setInviteToken(inviteToken);
+            inviteLink.setSurvey(survey);
+            inviteLink.setInvitedUserMail(mail);
+            inviteLink.setCreatedBy(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName());
+            inviteLinkRepository.save(inviteLink);
+            //mailService.sendSimpleMail(mail,survey.getName(),survey,inviteLink);
+        }
+    }
+
+    @Override
+    public void deletePeopleToSurvey(String surveyId, List<String> userEmails) {
+        if (!surveyRepository.existsById(surveyId)) {
+            throw new RuntimeException("Anket bulunamadı");
+        }
+
+        inviteLinkRepository.deleteBySurvey_SurveyIdAndInvitedUserMailIn(surveyId, userEmails);
+    }
+
+
     // 7. GET /surveys/{surveyId}/responses - Soru bazlı cevap raporu
     @Transactional(readOnly = true)
     public SurveyResponsesReportDto getResponsesReport(String surveyId) {

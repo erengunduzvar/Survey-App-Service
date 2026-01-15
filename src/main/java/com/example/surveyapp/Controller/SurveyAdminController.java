@@ -55,4 +55,25 @@ public class SurveyAdminController {
     public ResponseEntity<SurveyResponsesReportDto> getResponsesReport(@PathVariable String surveyId) {
         return ResponseEntity.ok(surveyService.getResponsesReport(surveyId));
     }
+    // 8. Ankete toplu katılımcı ekle ve davet linki oluştur
+    @PostMapping("/{surveyId}/add-people")
+    public ResponseEntity<Void> addPeopleToSurvey(
+            @PathVariable String surveyId,
+            @RequestBody List<String> userEmails) {
+
+        surveyService.addPeopleToSurvey(surveyId, userEmails);
+        return ResponseEntity.ok().build();
+    }
+
+    // 9. Ankete ait davet linklerini (katılımcıları) toplu sil
+    @DeleteMapping("/{surveyId}/remove-people")
+    public ResponseEntity<Void> deletePeopleToSurvey(
+            @PathVariable String surveyId,
+            @RequestBody List<String> userEmails) {
+
+        surveyService.deletePeopleToSurvey(surveyId, userEmails);
+        return ResponseEntity.noContent().build(); // 204 No Content dönmek silme işlemleri için standarttır
+    }
+
+
 }

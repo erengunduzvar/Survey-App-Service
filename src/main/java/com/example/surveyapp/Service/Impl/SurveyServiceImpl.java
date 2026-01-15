@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,7 +41,7 @@ public class SurveyServiceImpl implements SurveyService {
     @Transactional
     public SurveyDto save(SurveyDto dto) {
         // 1. Survey nesnesini oluştur
-        Survey survey = Survey.builder().name(dto.name()).status(SurveyStatus.DRAFT).startDate(dto.startDate()).endDate(dto.endDate()).usersToSend(dto.usersToSend()).build();
+        Survey survey = Survey.builder().name(dto.name()).status(SurveyStatus.DRAFT).startDate(LocalDateTime.now()).endDate(dto.endDate()).usersToSend(dto.usersToSend()).build();
 
         // 2. Eğer DTO içinde sectionlar varsa, onları da bağla
         if (dto.sections() != null) {

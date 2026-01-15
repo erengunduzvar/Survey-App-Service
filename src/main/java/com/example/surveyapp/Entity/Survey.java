@@ -24,8 +24,7 @@ public class Survey {
     @Enumerated(EnumType.STRING)
     private SurveyStatus status;
 
-    @Builder.Default
-    private LocalDateTime startDate = LocalDateTime.now();
+    private LocalDateTime startDate;
 
     private LocalDateTime endDate;
 

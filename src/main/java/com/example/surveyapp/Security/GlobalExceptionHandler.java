@@ -1,6 +1,5 @@
-package com.example.surveyapp.Controller;
+package com.example.surveyapp.Security;
 
-import com.example.surveyapp.Model.Dto.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

@@ -1,4 +1,4 @@
-package com.example.surveyapp.Model.Dto;
+package com.example.surveyapp.Security;
 
 public record ErrorResponse(
         int status,

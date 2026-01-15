@@ -1,5 +1,6 @@
 package com.example.surveyapp.Service;
 
+import com.example.surveyapp.Dto.AnswerDto;
 import com.example.surveyapp.Dto.SurveyDto;
 import com.example.surveyapp.Dto.SurveyResponsesReportDto;
 
@@ -14,5 +15,5 @@ public interface SurveyService {
     void duplicateSurvey(String surveyId, String newName);
     SurveyResponsesReportDto getResponsesReport(String surveyId);
     SurveyDto getSurveyByInviteToken(String token);
-    void submitSurveyByInviteToken(String token, SurveyDto surveyDto);
+    void submitSurveyByInviteToken(String token, List<AnswerDto> answerDtoList);
 }

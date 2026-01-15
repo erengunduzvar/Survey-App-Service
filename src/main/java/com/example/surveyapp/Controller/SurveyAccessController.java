@@ -1,5 +1,6 @@
 package com.example.surveyapp.Controller;
 
+import com.example.surveyapp.Dto.AnswerDto;
 import com.example.surveyapp.Dto.SurveyDto;
 import com.example.surveyapp.Service.SurveyService;
 import com.example.surveyapp.Validators.InviteTokenValidator;
@@ -7,6 +8,8 @@ import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/surveyAccess")
@@ -30,9 +33,9 @@ public class SurveyAccessController {
     @PostMapping("/{token}")
     public ResponseEntity<Void> postSurveyByToken(
             @PathVariable String token,
-            @RequestBody SurveyDto surveyDto) {
+            @RequestBody List<AnswerDto> AnswerDtoList) {
 
-        surveyService.submitSurveyByInviteToken(token, surveyDto);
+        surveyService.submitSurveyByInviteToken(token, AnswerDtoList);
         return ResponseEntity.ok().build();
     }
 }

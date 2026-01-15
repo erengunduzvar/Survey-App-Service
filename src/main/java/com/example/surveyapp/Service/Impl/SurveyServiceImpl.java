@@ -4,10 +4,7 @@ import com.example.surveyapp.Dto.*;
 import com.example.surveyapp.Entity.*;
 import com.example.surveyapp.Enum.QuestionTypeEnum;
 import com.example.surveyapp.Enum.SurveyStatus;
-import com.example.surveyapp.Repository.InviteLinkRepository;
-import com.example.surveyapp.Repository.QuestionsRepository;
-import com.example.surveyapp.Repository.SectionRepository;
-import com.example.surveyapp.Repository.SurveyRepository;
+import com.example.surveyapp.Repository.*;
 import com.example.surveyapp.Service.InviteTokenService;
 import com.example.surveyapp.Service.MailService;
 import com.example.surveyapp.Service.SurveyService;
@@ -18,10 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,48 +28,31 @@ public class SurveyServiceImpl implements SurveyService {
     private final InviteTokenService inviteTokenService;
     private final MailService mailService;
     private final InviteTokenValidator inviteTokenValidator;
+    private final AnswersRepository answersRepository;
 
     // 1. GET /surveys - Tüm anketleri listele
     @Transactional(readOnly = true)
     public List<SurveyDto> findAll() {
-        return surveyRepository.findAll().stream()
-                .map(SurveyDto::mapToDtoWithoutDetails)
-                .toList();
+        return surveyRepository.findAll().stream().map(SurveyDto::mapToDtoWithoutDetails).toList();
     }
 
     // 2. POST /surveys - Yeni anket oluştur (Hiyerarşik)
     @Transactional
     public SurveyDto save(SurveyDto dto) {
         // 1. Survey nesnesini oluştur
-        Survey survey = Survey.builder()
-                .name(dto.name())
-                .status(SurveyStatus.DRAFT)
-                .startDate(dto.startDate())
-                .endDate(dto.endDate())
-                .usersToSend(dto.usersToSend())
-                .build();
+        Survey survey = Survey.builder().name(dto.name()).status(SurveyStatus.DRAFT).startDate(dto.startDate()).endDate(dto.endDate()).usersToSend(dto.usersToSend()).build();
 
         // 2. Eğer DTO içinde sectionlar varsa, onları da bağla
         if (dto.sections() != null) {
             List<Section> sections = dto.sections().stream().map(sDto -> {
-                Section section = Section.builder()
-                        .sectionName(sDto.sectionName())
-                        .priority(sDto.priority())
-                        .survey(survey) // Survey bağlantısı
+                Section section = Section.builder().sectionName(sDto.sectionName()).priority(sDto.priority()).survey(survey) // Survey bağlantısı
                         .build();
 
                 // 3. Section içindeki soruları bağla
                 if (sDto.questions() != null) {
-                    List<Questions> questions = sDto.questions().stream().map(qDto ->
-                            Questions.builder()
-                                    .questionText(qDto.questionText())
-                                    .questionType(qDto.questionType())
-                                    .questionPriority(qDto.questionPriority())
-                                    .questionAnswers(qDto.questionAnswers())
-                                    .section(section) // Section bağlantısı
-                                    .survey(survey)   // Survey bağlantısı
-                                    .build()
-                    ).collect(Collectors.toList());
+                    List<Questions> questions = sDto.questions().stream().map(qDto -> Questions.builder().questionText(qDto.questionText()).questionType(qDto.questionType()).questionPriority(qDto.questionPriority()).questionAnswers(qDto.questionAnswers()).section(section) // Section bağlantısı
+                            .survey(survey)   // Survey bağlantısı
+                            .build()).collect(Collectors.toList());
                     section.setQuestions(questions);
                 }
                 return section;
@@ -89,8 +66,7 @@ public class SurveyServiceImpl implements SurveyService {
     // 3. GET /surveys/{surveyId} - Hiyerarşik anket detayı
     @Transactional(readOnly = true)
     public SurveyDto findById(String surveyId) {
-        Survey survey = surveyRepository.findById(surveyId)
-                .orElseThrow(() -> new RuntimeException("Anket bulunamadı: " + surveyId));
+        Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new RuntimeException("Anket bulunamadı: " + surveyId));
         return SurveyDto.mapToDto(survey);
     }
 
@@ -99,8 +75,7 @@ public class SurveyServiceImpl implements SurveyService {
     @Transactional
     public SurveyDto update(String surveyId, SurveyDto dto) {
         // 1. Mevcut anketi getir
-        Survey survey = surveyRepository.findById(surveyId)
-                .orElseThrow(() -> new RuntimeException("Anket bulunamadı"));
+        Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new RuntimeException("Anket bulunamadı"));
 
         // 2. Durum kontrolü
         if (survey.getStatus() != SurveyStatus.DRAFT) {
@@ -120,14 +95,14 @@ public class SurveyServiceImpl implements SurveyService {
             updateSections(survey, dto);
         }
 
-        if(dto.status() == SurveyStatus.PUBLISHED && dto.sections() == null || Objects.requireNonNull(dto.sections()).getFirst().questions() == null) {
+        if (dto.status() == SurveyStatus.PUBLISHED && dto.sections() == null || Objects.requireNonNull(dto.sections()).getFirst().questions() == null) {
             throw new RuntimeException("Boş anket gönderilemez");
         }
 
-        if(dto.status() == SurveyStatus.PUBLISHED) {
+        if (dto.status() == SurveyStatus.PUBLISHED) {
             List<String> usersToSend = survey.getUsersToSend();
             for (String mail : usersToSend) {
-                String inviteToken =  inviteTokenService.generateToken(mail,surveyId);
+                String inviteToken = inviteTokenService.generateToken(mail, surveyId);
                 InviteLink inviteLink = new InviteLink();
                 inviteLink.setInviteToken(inviteToken);
                 inviteLink.setSurvey(survey);
@@ -145,8 +120,7 @@ public class SurveyServiceImpl implements SurveyService {
     // 5. DELETE /surveys/{surveyId} - Anket sil
     @Transactional
     public void delete(String surveyId) {
-        Survey survey = surveyRepository.findById(surveyId)
-                .orElseThrow(() -> new RuntimeException("Anket bulunamadı."));
+        Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new RuntimeException("Anket bulunamadı."));
 
         // İŞ MANTIĞI: Yayınlanmış anket silinemez
         if (survey.getStatus() == SurveyStatus.PUBLISHED) {
@@ -158,37 +132,22 @@ public class SurveyServiceImpl implements SurveyService {
     // 6. POST /surveys/{surveyId}/duplicate - Anket Çoklama (Deep Copy)
     @Transactional
     public void duplicateSurvey(String surveyId, String newName) {
-        Survey original = surveyRepository.findById(surveyId)
-                .orElseThrow(() -> new RuntimeException("Kaynak anket bulunamadı"));
+        Survey original = surveyRepository.findById(surveyId).orElseThrow(() -> new RuntimeException("Kaynak anket bulunamadı"));
 
-        Survey copy = Survey.builder()
-                .name(newName)
-                .status(SurveyStatus.DRAFT)
-                .usersToSend(original.getUsersToSend())
-                .build();
+        Survey copy = Survey.builder().name(newName).status(SurveyStatus.DRAFT).usersToSend(original.getUsersToSend()).build();
         Survey savedCopy = surveyRepository.save(copy);
 
         original.getSections().forEach(origSec -> {
-            Section secCopy = Section.builder()
-                    .sectionName(origSec.getSectionName())
-                    .priority(origSec.getPriority())
-                    .survey(savedCopy)
-                    .build();
+            Section secCopy = Section.builder().sectionName(origSec.getSectionName()).priority(origSec.getPriority()).survey(savedCopy).build();
             Section savedSec = sectionRepository.save(secCopy);
 
             origSec.getQuestions().forEach(origQ -> {
-                Questions qCopy = Questions.builder()
-                        .questionText(origQ.getQuestionText())
-                        .questionType(origQ.getQuestionType())
-                        .questionPriority(origQ.getQuestionPriority())
-                        .questionAnswers(origQ.getQuestionAnswers())
-                        .survey(savedCopy)
-                        .section(savedSec)
-                        .build();
+                Questions qCopy = Questions.builder().questionText(origQ.getQuestionText()).questionType(origQ.getQuestionType()).questionPriority(origQ.getQuestionPriority()).questionAnswers(origQ.getQuestionAnswers()).survey(savedCopy).section(savedSec).build();
                 questionsRepository.save(qCopy);
             });
         });
     }
+
     @Override
     public SurveyDto getSurveyByInviteToken(String token) {
         // 1. Token geçerli mi? (Geçersizse validator exception fırlatmalı)
@@ -201,19 +160,47 @@ public class SurveyServiceImpl implements SurveyService {
 
         // 3. Veriyi çek ve DTO'ya çevir
         String surveyId = claims.get("surveyId", String.class);
-        return surveyRepository.findById(surveyId)
-                .map(SurveyDto::mapToDto)
-                .orElseThrow(() -> new RuntimeException("Anket bulunamadı."));
+        return surveyRepository.findById(surveyId).map(SurveyDto::mapToDto).orElseThrow(() -> new RuntimeException("Anket bulunamadı."));
     }
 
     @Override
     @Transactional
-    public void submitSurveyByInviteToken(String token, SurveyDto surveyDto) {
+    public void submitSurveyByInviteToken(String token, List<AnswerDto> answerDtoList) {
         Claims claims = inviteTokenValidator.validate(token);
+        String surveyId = claims.get("surveyId", String.class);
 
+        if (surveyId == null) {
+            throw new RuntimeException("Anket bulunamadı.");
+        }
+        if (inviteLinkRepository.findByInviteToken(token).isEmpty()) {
+            throw new RuntimeException("Geçersiz davet linki.");
+        }
         if (claims.getExpiration().before(new java.util.Date())) {
             throw new RuntimeException("Süresi dolmuş link ile cevap gönderilemez.");
         }
+
+        // 2. Anketi ve soruları getir (Validation için)
+        Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new RuntimeException("Anket bulunamadı."));
+
+        // Anketteki tüm soruları hızlı erişim için bir Map'e koy: <QuestionId, QuestionEntity>
+        Map<Long, Questions> questionMap = survey.getSections().stream().flatMap(section -> section.getQuestions().stream()).collect(Collectors.toMap(Questions::getQuestionId, q -> q));
+
+        // 3. Cevapları Entity listesine dönüştürürken VALIDASYON yap
+        List<Answers> entitiesToSave = answerDtoList.stream().map(dto -> {
+            Questions question = questionMap.get(dto.questionId());
+
+            if (question == null) {
+                throw new RuntimeException("Geçersiz soru ID'si: " + dto.questionId());
+            }
+
+            return Answers.builder().answer(dto.answer()).question(question) // İlişki kuruldu
+                    .survey(survey)     // İlişki kuruldu
+                    .build();
+        }).toList();
+
+        // 4. AnswersRepository üzerinden toplu kayıt (En sağlıklı adım)
+        answersRepository.saveAll(entitiesToSave);
+
 
         // Burada cevapları kaydetme mantığı çalışacak
         // Örn: surveyService.save(surveyDto);
@@ -222,22 +209,14 @@ public class SurveyServiceImpl implements SurveyService {
     // 7. GET /surveys/{surveyId}/responses - Soru bazlı cevap raporu
     @Transactional(readOnly = true)
     public SurveyResponsesReportDto getResponsesReport(String surveyId) {
-        Survey survey = surveyRepository.findById(surveyId)
-                .orElseThrow(() -> new RuntimeException("Anket bulunamadı"));
+        Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new RuntimeException("Anket bulunamadı"));
 
-        List<QuestionReportDto> questionReports = survey.getSections().stream()
-                .flatMap(section -> section.getQuestions().stream())
-                .map(q -> new QuestionReportDto(
-                        q.getQuestionId(),
-                        q.getQuestionText(),
-                        calculateAverageScoreInternal(q), // Puan hesaplama burada çağrılıyor
-                        q.getAnswers().stream()
-                                .map(a -> new UserAnswerDto(1L, a.getAnswer()))
-                                .toList()
-                )).toList();
+        List<QuestionReportDto> questionReports = survey.getSections().stream().flatMap(section -> section.getQuestions().stream()).map(q -> new QuestionReportDto(q.getQuestionId(), q.getQuestionText(), calculateAverageScoreInternal(q), // Puan hesaplama burada çağrılıyor
+                q.getAnswers().stream().map(a -> new UserAnswerDto(1L, a.getAnswer())).toList())).toList();
 
         return new SurveyResponsesReportDto(survey.getSurveyId(), survey.getName(), questionReports);
     }
+
     // Helper metod: Dışarıdan id almak yerine direkt nesne ile çalışır
     private Double calculateAverageScoreInternal(Questions question) {
         // 1. Sadece LIKERT tipindeyse hesaplama yap
@@ -290,11 +269,7 @@ public class SurveyServiceImpl implements SurveyService {
                 section.setPriority(sDto.priority());
             } else {
                 // YENİ BÖLÜM EKLE
-                section = Section.builder()
-                        .sectionName(sDto.sectionName())
-                        .priority(sDto.priority())
-                        .survey(survey)
-                        .build();
+                section = Section.builder().sectionName(sDto.sectionName()).priority(sDto.priority()).survey(survey).build();
             }
 
             // BÖLÜMÜN SORULARINI GÜNCELLE
@@ -325,21 +300,13 @@ public class SurveyServiceImpl implements SurveyService {
                 return q;
             } else {
                 // YENİ SORU EKLE
-                return Questions.builder()
-                        .questionText(qDto.questionText())
-                        .questionType(qDto.questionType())
-                        .questionPriority(qDto.questionPriority())
-                        .questionAnswers(qDto.questionAnswers())
-                        .section(section)
-                        .survey(survey)
-                        .build();
+                return Questions.builder().questionText(qDto.questionText()).questionType(qDto.questionType()).questionPriority(qDto.questionPriority()).questionAnswers(qDto.questionAnswers()).section(section).survey(survey).build();
             }
         }).collect(Collectors.toList());
 
         section.getQuestions().clear();
         section.getQuestions().addAll(updatedQuestions);
     }
-
 
 
 }

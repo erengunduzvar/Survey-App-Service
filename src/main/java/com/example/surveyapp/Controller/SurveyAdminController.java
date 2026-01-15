@@ -12,6 +12,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(
+        origins = "http://localhost:5173",
+        allowedHeaders = {"Authorization", "Content-Type"},
+        methods = {RequestMethod.GET, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.POST, RequestMethod.OPTIONS}
+)
 @RestController
 @RequestMapping("/api/surveys")
 @RequiredArgsConstructor
@@ -46,7 +51,7 @@ public class SurveyAdminController {
     }
 
     @PostMapping("/{surveyId}/duplicate")
-    public ResponseEntity<Void> duplicateSurvey(@PathVariable String surveyId, @RequestParam String newName) {
+    public ResponseEntity<Void> duplicateSurvey(@PathVariable String surveyId, @RequestBody String newName) {
         surveyService.duplicateSurvey(surveyId, newName);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

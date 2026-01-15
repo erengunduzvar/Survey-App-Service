@@ -143,8 +143,12 @@ public class SurveyServiceImpl implements SurveyService {
     // 5. DELETE /surveys/{surveyId} - Anket sil
     @Transactional
     public void delete(String surveyId) {
-        if (!surveyRepository.existsById(surveyId)) {
-            throw new RuntimeException("Silinecek anket bulunamadı");
+        Survey survey = surveyRepository.findById(surveyId)
+                .orElseThrow(() -> new RuntimeException("Anket bulunamadı."));
+
+        // İŞ MANTIĞI: Yayınlanmış anket silinemez
+        if (survey.getStatus() == SurveyStatus.PUBLISHED) {
+            throw new RuntimeException("Yayınlanmış (PUBLISHED) durumdaki bir anket silinemez. Lütfen önce arşive alın.");
         }
         surveyRepository.deleteById(surveyId);
     }

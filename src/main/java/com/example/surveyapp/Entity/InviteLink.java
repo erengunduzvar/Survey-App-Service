@@ -32,6 +32,4 @@ public class InviteLink {
 
     @Column(unique = true,length = 1000)
     private String inviteToken;
-
-    private LocalDateTime tokenExpireDate;
 }

@@ -10,8 +10,7 @@ public record InviteLinkDto(
         String invitedUserMail,
         String surveyId,         // Entity'deki Survey objesinin ID'si
         Boolean isSurveyComplete,
-        String inviteToken,
-        LocalDateTime tokenExpireDate
+        String inviteToken
 ) {
 
     public static InviteLinkDto mapToDto(InviteLink entity) {
@@ -21,12 +20,7 @@ public record InviteLinkDto(
                 entity.getInvitedUserMail(),
                 entity.getSurvey() != null ? entity.getSurvey().getSurveyId() : null,
                 entity.getIsSurveyComplete(),
-                entity.getInviteToken(),
-                entity.getTokenExpireDate()
+                entity.getInviteToken()
         );
-    }
-
-    public boolean isExpired() {
-        return tokenExpireDate != null && tokenExpireDate.isBefore(LocalDateTime.now());
     }
 }

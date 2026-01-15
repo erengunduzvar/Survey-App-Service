@@ -132,17 +132,42 @@ public class SurveyServiceImpl implements SurveyService {
     // 6. POST /surveys/{surveyId}/duplicate - Anket Çoklama (Deep Copy)
     @Transactional
     public void duplicateSurvey(String surveyId, String newName) {
-        Survey original = surveyRepository.findById(surveyId).orElseThrow(() -> new RuntimeException("Kaynak anket bulunamadı"));
+        Survey original = surveyRepository.findById(surveyId)
+                .orElseThrow(() -> new RuntimeException("Kaynak anket bulunamadı"));
 
-        Survey copy = Survey.builder().name(newName).status(SurveyStatus.DRAFT).usersToSend(original.getUsersToSend()).build();
+        // HATA BURADAYDI: original.getUsersToSend() yerine yeni bir liste oluşturuyoruz
+        List<String> copiedUsers = original.getUsersToSend() != null
+                ? new ArrayList<>(original.getUsersToSend())
+                : new ArrayList<>();
+
+        Survey copy = Survey.builder()
+                .name(newName)
+                .status(SurveyStatus.DRAFT)
+                .startDate(original.getStartDate()) // Tarihleri de istersen kopyalayabilirsin
+                .endDate(original.getEndDate())
+                .usersToSend(copiedUsers) // Yeni referans verildi
+                .build();
+
         Survey savedCopy = surveyRepository.save(copy);
 
+        // Geri kalan kısımlar aynı kalabilir...
         original.getSections().forEach(origSec -> {
-            Section secCopy = Section.builder().sectionName(origSec.getSectionName()).priority(origSec.getPriority()).survey(savedCopy).build();
+            Section secCopy = Section.builder()
+                    .sectionName(origSec.getSectionName())
+                    .priority(origSec.getPriority())
+                    .survey(savedCopy)
+                    .build();
             Section savedSec = sectionRepository.save(secCopy);
 
             origSec.getQuestions().forEach(origQ -> {
-                Questions qCopy = Questions.builder().questionText(origQ.getQuestionText()).questionType(origQ.getQuestionType()).questionPriority(origQ.getQuestionPriority()).questionAnswers(origQ.getQuestionAnswers()).survey(savedCopy).section(savedSec).build();
+                Questions qCopy = Questions.builder()
+                        .questionText(origQ.getQuestionText())
+                        .questionType(origQ.getQuestionType())
+                        .questionPriority(origQ.getQuestionPriority())
+                        .questionAnswers(origQ.getQuestionAnswers())
+                        .survey(savedCopy)
+                        .section(savedSec)
+                        .build();
                 questionsRepository.save(qCopy);
             });
         });

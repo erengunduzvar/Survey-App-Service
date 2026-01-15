@@ -107,6 +107,7 @@ public class SurveyServiceImpl implements ISurveyService {
         survey.setName(dto.name());
         survey.setEndDate(dto.endDate());
         survey.setUsersToSend(dto.usersToSend());
+        survey.setStatus(dto.status());
 
         // 4. SECTIONS VE QUESTIONS GÜNCELLEME (Senkronizasyon)
         if (dto.sections() != null) {
